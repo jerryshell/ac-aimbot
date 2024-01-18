@@ -4,7 +4,7 @@
 
 # AssaultCube Aimbot DLL with Rust 🦀
 
-YouTube Video: *TODO*
+YouTube Video: [https://www.youtube.com/watch?v=o4X3YpwstUE](https://www.youtube.com/watch?v=o4X3YpwstUE)
 
 Applicable Game Version: **1.3.0.2**
 
