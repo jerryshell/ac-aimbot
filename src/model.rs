@@ -23,17 +23,17 @@ pub struct Entity {
 impl Entity {
     pub fn new(base_ptr: *const u32) -> Entity {
         let head_position = Vec3 {
-            x: util::read_f32(base_ptr, offset::HEAD_POSITION_X),
-            y: util::read_f32(base_ptr, offset::HEAD_POSITION_Y),
-            z: util::read_f32(base_ptr, offset::HEAD_POSITION_Z),
+            x: util::read_memory::<f32>(base_ptr, offset::HEAD_POSITION_X),
+            y: util::read_memory::<f32>(base_ptr, offset::HEAD_POSITION_Y),
+            z: util::read_memory::<f32>(base_ptr, offset::HEAD_POSITION_Z),
         };
 
         let view_angle = Vec2 {
-            x: util::read_f32(base_ptr, offset::VIEW_ANGLE_X),
-            y: util::read_f32(base_ptr, offset::VIEW_ANGLE_Y),
+            x: util::read_memory::<f32>(base_ptr, offset::VIEW_ANGLE_X),
+            y: util::read_memory::<f32>(base_ptr, offset::VIEW_ANGLE_Y),
         };
 
-        let health = util::read_i32(base_ptr, offset::HEALTH);
+        let health = util::read_memory::<i32>(base_ptr, offset::HEALTH);
 
         Entity {
             base_ptr,
