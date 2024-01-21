@@ -23,11 +23,11 @@ where
     }
 }
 
-pub fn write_f32(base_ptr: *const u32, offset: u32, value: f32) {
+pub fn write_memory<T>(base_ptr: *const u32, offset: u32, value: T) {
     unsafe {
         let base_ptr_deref = *base_ptr;
-        let f32_ptr = (base_ptr_deref + offset) as *mut f32;
-        *f32_ptr = value
+        let data_ptr = (base_ptr_deref + offset) as *mut T;
+        *data_ptr = value
     }
 }
 
@@ -54,13 +54,13 @@ pub fn calculate_angle(local_player: &model::Entity, target_entity: &model::Enti
 }
 
 pub fn aim(local_player: &model::Entity, target_view_angle: &model::Vec2) {
-    write_f32(
+    write_memory::<f32>(
         local_player.base_ptr,
         offset::VIEW_ANGLE_X,
         target_view_angle.x,
     );
 
-    write_f32(
+    write_memory::<f32>(
         local_player.base_ptr,
         offset::VIEW_ANGLE_Y,
         target_view_angle.y,
