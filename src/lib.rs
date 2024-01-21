@@ -14,6 +14,8 @@ use windows::{
 const VKEY_F: i32 = 0x46;
 
 fn run() -> Result<()> {
+    let refresh_interval_ms = 1000 / 60;
+
     let module_base_addr = unsafe { GetModuleHandleA(s!("ac_client.exe")).map(|h| h.0 as u32) }?;
 
     let local_player_base_ptr = util::build_ptr(module_base_addr, offset::LOCAL_PLAYER);
@@ -23,7 +25,7 @@ fn run() -> Result<()> {
     let mut aimbot_enable_flag = false;
 
     loop {
-        std::thread::sleep(std::time::Duration::from_millis(1000 / 30));
+        let start = std::time::Instant::now();
 
         unsafe {
             if GetAsyncKeyState(VKEY_F) & 0x1 == 1 {
@@ -32,6 +34,7 @@ fn run() -> Result<()> {
         };
 
         if !aimbot_enable_flag {
+            sleep(start, refresh_interval_ms);
             continue;
         }
 
@@ -56,6 +59,7 @@ fn run() -> Result<()> {
             .collect::<Vec<model::Entity>>();
 
         if entity_list.is_empty() {
+            sleep(start, refresh_interval_ms);
             continue;
         }
 
@@ -66,6 +70,18 @@ fn run() -> Result<()> {
         let angle = util::calculate_angle(&local_player, target_entity);
 
         util::aim(&local_player, &angle);
+
+        sleep(start, refresh_interval_ms);
+    }
+}
+
+fn sleep(start: std::time::Instant, refresh_interval_ms: u64) {
+    let delta = start.elapsed();
+    let delta_ms = delta.as_millis() as u64;
+    if refresh_interval_ms > delta_ms {
+        std::thread::sleep(std::time::Duration::from_millis(
+            refresh_interval_ms - delta_ms,
+        ));
     }
 }
 
