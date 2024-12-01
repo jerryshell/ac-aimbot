@@ -1,6 +1,6 @@
 [package]
 name = "ac-aimbot"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 [lib]
@@ -9,7 +9,6 @@ crate-type = ["cdylib"]
 [dependencies]
 anyhow = "*"
 windows = { version = "*", features = [
-    "Win32_Foundation",
     "Win32_System_LibraryLoader",
     "Win32_System_SystemServices",
     "Win32_UI_Input_KeyboardAndMouse",
