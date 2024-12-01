@@ -3,38 +3,39 @@ mod offset;
 mod util;
 
 use anyhow::Result;
+use std::time::{Duration, Instant};
 use windows::{
-    core::*,
+    core::s,
     Win32::{
-        Foundation::*, System::LibraryLoader::*, System::SystemServices::*,
+        Foundation::HINSTANCE,
+        System::{LibraryLoader::GetModuleHandleA, SystemServices::DLL_PROCESS_ATTACH},
         UI::Input::KeyboardAndMouse::GetAsyncKeyState,
     },
 };
 
+const FRAME_RATE: u64 = 60;
+
 const VKEY_F: i32 = 0x46;
 
 fn run() -> Result<()> {
-    let refresh_interval_ms = 1000 / 60;
-
     let module_base_addr = unsafe { GetModuleHandleA(s!("ac_client.exe")).map(|h| h.0 as u32) }?;
-
     let local_player_base_ptr = util::build_ptr(module_base_addr, offset::LOCAL_PLAYER);
-
     let entity_list_base_ptr = util::build_ptr(module_base_addr, offset::ENTITY_LIST);
 
     let mut aimbot_enable_flag = false;
 
-    loop {
-        let start = std::time::Instant::now();
+    let tick_rate = Duration::from_millis(1000 / FRAME_RATE);
+    let mut last_tick = Instant::now();
 
+    loop {
         unsafe {
             if GetAsyncKeyState(VKEY_F) & 0x1 == 1 {
                 aimbot_enable_flag = !aimbot_enable_flag;
             }
         };
 
-        if !aimbot_enable_flag {
-            sleep(start, refresh_interval_ms);
+        if aimbot_enable_flag {
+            sleep(&tick_rate, &last_tick);
             continue;
         }
 
@@ -59,7 +60,7 @@ fn run() -> Result<()> {
             .collect::<Vec<model::Entity>>();
 
         if entity_list.is_empty() {
-            sleep(start, refresh_interval_ms);
+            sleep(&tick_rate, &last_tick);
             continue;
         }
 
@@ -71,18 +72,14 @@ fn run() -> Result<()> {
 
         util::aim(&local_player, &angle);
 
-        sleep(start, refresh_interval_ms);
+        sleep(&tick_rate, &last_tick);
+        last_tick = Instant::now();
     }
 }
 
-fn sleep(start: std::time::Instant, refresh_interval_ms: u64) {
-    let delta = start.elapsed();
-    let delta_ms = delta.as_millis() as u64;
-    if refresh_interval_ms > delta_ms {
-        std::thread::sleep(std::time::Duration::from_millis(
-            refresh_interval_ms - delta_ms,
-        ));
-    }
+fn sleep(tick_rate: &Duration, last_tick: &Instant) {
+    let timeout = tick_rate.saturating_sub(last_tick.elapsed());
+    std::thread::sleep(timeout);
 }
 
 #[no_mangle]

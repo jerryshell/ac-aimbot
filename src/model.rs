@@ -15,7 +15,6 @@ pub struct Vec3 {
 pub struct Entity {
     pub base_ptr: *const u32,
     pub head_position: Vec3,
-    pub view_angle: Vec2,
     pub health: i32,
     pub distance_to_player: f32,
 }
@@ -28,17 +27,11 @@ impl Entity {
             z: util::read_memory::<f32>(base_ptr, offset::HEAD_POSITION_Z),
         };
 
-        let view_angle = Vec2 {
-            x: util::read_memory::<f32>(base_ptr, offset::VIEW_ANGLE_X),
-            y: util::read_memory::<f32>(base_ptr, offset::VIEW_ANGLE_Y),
-        };
-
         let health = util::read_memory::<i32>(base_ptr, offset::HEALTH);
 
         Entity {
             base_ptr,
             head_position,
-            view_angle,
             health,
             distance_to_player: 0.0,
         }
