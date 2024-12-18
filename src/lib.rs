@@ -3,7 +3,10 @@ mod offset;
 mod util;
 
 use anyhow::Result;
-use std::time::{Duration, Instant};
+use std::{
+    thread,
+    time::{Duration, Instant},
+};
 use windows::{
     core::s,
     Win32::{
@@ -79,13 +82,13 @@ fn run() -> Result<()> {
 
 fn sleep(tick_rate: &Duration, last_tick: &Instant) {
     let timeout = tick_rate.saturating_sub(last_tick.elapsed());
-    std::thread::sleep(timeout);
+    thread::sleep(timeout);
 }
 
 #[no_mangle]
 extern "system" fn DllMain(_dll_module: HINSTANCE, call_reason: u32, _reserved: *mut ()) -> bool {
     if call_reason == DLL_PROCESS_ATTACH {
-        std::thread::spawn(move || {
+        thread::spawn(move || {
             let _ = run();
         });
     }
