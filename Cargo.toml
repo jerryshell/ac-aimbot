@@ -1,21 +1,21 @@
 [package]
+edition = "2024"
 name = "ac-aimbot"
 version = "0.1.2"
-edition = "2021"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "*"
-windows = { version = "*", features = [
-    "Win32_System_LibraryLoader",
-    "Win32_System_SystemServices",
-    "Win32_UI_Input_KeyboardAndMouse",
-] }
+windows = {version = "*", features = [
+  "Win32_System_LibraryLoader",
+  "Win32_System_SystemServices",
+  "Win32_UI_Input_KeyboardAndMouse",
+]}
 
 [profile.release]
-lto = true
-strip = true
-panic = "abort"
 codegen-units = 1
+lto = true
+panic = "abort"
+strip = true

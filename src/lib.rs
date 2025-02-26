@@ -8,12 +8,12 @@ use std::{
     time::{Duration, Instant},
 };
 use windows::{
-    core::s,
     Win32::{
         Foundation::HINSTANCE,
         System::{LibraryLoader::GetModuleHandleA, SystemServices::DLL_PROCESS_ATTACH},
         UI::Input::KeyboardAndMouse::GetAsyncKeyState,
     },
+    core::s,
 };
 
 const FRAME_RATE: u64 = 60;
@@ -85,7 +85,7 @@ fn sleep(tick_rate: &Duration, last_tick: &Instant) {
     thread::sleep(timeout);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "system" fn DllMain(_dll_module: HINSTANCE, call_reason: u32, _reserved: *mut ()) -> bool {
     if call_reason == DLL_PROCESS_ATTACH {
         thread::spawn(move || {
